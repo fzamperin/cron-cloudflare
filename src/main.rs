@@ -1,6 +1,7 @@
 mod models;
 mod services;
 
+use dotenv::dotenv;
 use std::sync::Mutex;
 
 use models::config::Config;
@@ -10,6 +11,7 @@ use services::{config_reader::get_config, cron};
 static FILE_CONFIG: Lazy<Mutex<Vec<Config>>> = Lazy::new(|| Mutex::new(vec![]));
 
 fn main() {
+    dotenv().ok();
     read_config();
     cron::start_cron();
 }
