@@ -1,6 +1,6 @@
 [package]
 name = "cron-cloudflare"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["Fernando 'bife' Penna <futured@gmail.com>"]
 

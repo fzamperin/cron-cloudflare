@@ -7,12 +7,9 @@ WORKDIR /usr/src/cron-cloudflare
 
 COPY . .
 
-RUN bash docker/platform.sh && \
-    rustup target add $(cat /.platform) && \
-    cat /.platform && \
-    cargo install --path . --target $(cat /.platform)
+RUN cargo install --path --locked .
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 RUN apt-get update && \
     apt-get install -y libssl1.1 ca-certificates && \
