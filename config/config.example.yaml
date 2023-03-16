@@ -1,0 +1,12 @@
+auth: AUTH_TOKEN
+domains:
+  - name: "DOMAIN_1"
+    type_ip: A
+    proxied: false
+    create: true
+    zone_id: ZONE_ID
+  - name: "DOMAIN_2"
+    type_ip: AAAA
+    proxied: false
+    create: true
+    zone_id: ZONE_ID
