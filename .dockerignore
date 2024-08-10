@@ -1,4 +1,6 @@
 /target
 config
+release-build.sh
+README.md
 .env.example
 .env

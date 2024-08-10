@@ -21,5 +21,4 @@ pub struct ResultDNS {
     pub proxiable: bool,
     pub proxied: bool,
     pub ttl: i64,
-    pub locked: bool,
 }
