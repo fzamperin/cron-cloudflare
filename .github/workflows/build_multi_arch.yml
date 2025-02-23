@@ -1,0 +1,78 @@
+name: Build Multi-Arch Docker Image
+
+on:
+  push:
+    tags: 
+      - '*'
+  workflow_dispatch:
+
+env:
+  DOCKERHUB_REPO: docker.io/fzamperin/cron-cloudflare
+  TAG_VERSION: ${{ github.ref_name }}
+
+jobs:
+  build:
+    name: Build Multi-Arch Docker Image
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            tag_suffix: temp-amd64
+
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            tag_suffix: temp-arm64
+
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Platform-Specific Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ env.DOCKERHUB_REPO }}:${{ matrix.tag_suffix }}
+
+  create-manifest-and-push:
+    name: Create and Push Unified Manifest
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Create and Push Unified Manifest
+        run: |
+          docker manifest create ${{ env.DOCKERHUB_REPO }}:${{ env.TAG_VERSION }} \
+            ${{ env.DOCKERHUB_REPO }}:temp-amd64 \
+            ${{ env.DOCKERHUB_REPO }}:temp-arm64
+
+          docker manifest annotate ${{ env.DOCKERHUB_REPO }}:${{ env.TAG_VERSION }} \
+            ${{ env.DOCKERHUB_REPO }}:temp-amd64 --arch amd64
+
+          docker manifest annotate ${{ env.DOCKERHUB_REPO }}:${{ env.TAG_VERSION }} \
+            ${{ env.DOCKERHUB_REPO }}:temp-arm64 --arch arm64
+
+          docker manifest push ${{ env.DOCKERHUB_REPO }}:${{ env.TAG_VERSION }}
+
+          # Optional: Clean up temporary tags
+          docker image rm ${{ env.DOCKERHUB_REPO }}:temp-amd64
+          docker image rm ${{ env.DOCKERHUB_REPO }}:temp-arm64
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
