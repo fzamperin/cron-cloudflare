@@ -61,8 +61,6 @@ jobs:
 
       - name: Create and Push Unified Manifest
         run: |
-          docker pull ${{ env.DOCKERHUB_REPO }}:temp-amd64 ${{ env.DOCKERHUB_REPO }}:temp-arm64
-
           docker manifest create ${{ env.DOCKERHUB_REPO }}:${{ env.TAG_VERSION }} \
             ${{ env.DOCKERHUB_REPO }}:temp-amd64 \
             ${{ env.DOCKERHUB_REPO }}:temp-arm64
