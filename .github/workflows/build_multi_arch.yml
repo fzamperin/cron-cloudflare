@@ -45,6 +45,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: ${{ env.DOCKERHUB_REPO }}:${{ matrix.tag_suffix }}
+          provenance: false
+          sbom: false
 
   create-manifest-and-push:
     name: Create and Push Unified Manifest
