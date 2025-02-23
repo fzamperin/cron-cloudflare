@@ -75,8 +75,5 @@ jobs:
 
           docker manifest push ${{ env.DOCKERHUB_REPO }}:${{ env.TAG_VERSION }}
 
-          # Optional: Clean up temporary tags
-          docker image rm ${{ env.DOCKERHUB_REPO }}:temp-amd64
-          docker image rm ${{ env.DOCKERHUB_REPO }}:temp-arm64
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
